@@ -43,7 +43,8 @@ class Game extends Component {
     this.state = {
       history: [
         {
-          squares: Array(9).fill(null)
+          squares: Array(9).fill(null),
+          lastStep: 'Game start'
         }
       ],
       stepNumber: 0,
@@ -52,17 +53,20 @@ class Game extends Component {
   }
 
   handleClick(i) {
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
-    const current = history[history.length - 1];
+    const history = this.state.history;
+    const current = history[this.state.stepNumber];
     const squares = current.squares.slice();
     if (calculateWinner(squares) || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
+    const location = '(' + (Math.floor(i / 3) + 1) + ',' + (i % 3 + 1) + ')';
+    const desc = squares[i] + ' moved to ' + location;
     this.setState({
       history: history.concat([
         {
-          squares: squares
+          squares: squares,
+          lastStep: desc
         }
       ]),
       stepNumber: history.length,
@@ -78,18 +82,9 @@ class Game extends Component {
   }
 
   render() {
-    const history = this.state.history;
+    let history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-
-    const moves = history.map((step, move) => {
-      const desc = move ? 'Go to move #' + move : 'Go to game start';
-      return (
-        <li>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
 
     let status;
     if (winner) {
@@ -97,6 +92,17 @@ class Game extends Component {
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
+
+    const moves = history.map((step, move) => {
+      const desc = step.lastStep;
+      return (
+        <li key={move}>
+          <a href="#" onClick={() => this.jumpTo(move)}>
+            {desc}
+          </a>
+        </li>
+      );
+    });
 
     return (
       <div className="game">
