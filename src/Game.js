@@ -61,7 +61,8 @@ class Game extends Component {
         }
       ],
       stepNumber: 0,
-      xIsNext: true
+      xIsNext: true,
+      sort: false
     };
   }
 
@@ -94,6 +95,12 @@ class Game extends Component {
     });
   }
 
+  toggleSort() {
+    this.setState({
+      sort: !this.state.sort
+    });
+  }
+
   render() {
     let history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -104,6 +111,11 @@ class Game extends Component {
       status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+    }
+
+    if (this.state.sort) {
+      history = this.state.history.slice();
+      history.reverse();
     }
 
     const moves = history.map((step, move) => {
@@ -134,6 +146,7 @@ class Game extends Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => this.toggleSort()}>Sort</button>
           <ol>{moves}</ol>
         </div>
       </div>
